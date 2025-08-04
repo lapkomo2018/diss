@@ -7,4 +7,7 @@ require (
 	golang.org/x/time v0.12.0
 )
 
-require github.com/coder/websocket v1.8.13 // indirect
+require (
+	github.com/coder/websocket v1.8.13 // indirect
+	github.com/go-chi/cors v1.2.2 // indirect
+)
