@@ -10,7 +10,7 @@ services:
     environment:
       DB_SOURCE: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
     ports:
-        - "8000:8000"
+        - "8000:8080"
 
     restart: unless-stopped
 
