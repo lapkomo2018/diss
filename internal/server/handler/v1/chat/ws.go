@@ -21,11 +21,13 @@ func websocketHandler(chat chat.Chat) http.HandlerFunc {
 		}
 		defer conn.CloseNow()
 
-		handleWebSocketConnection(r.Context(), chat, conn)
+		handleWebSocketConnection(r.Context(), chat, conn, func(msg string) {
+			log.Printf("%s | send message: %s", r.RemoteAddr, msg)
+		})
 	}
 }
 
-func handleWebSocketConnection(ctx context.Context, chat chat.Chat, conn *websocket.Conn) {
+func handleWebSocketConnection(ctx context.Context, chat chat.Chat, conn *websocket.Conn, logFunc func(msg string)) {
 	var (
 		mu     sync.Mutex
 		closed bool
@@ -50,10 +52,10 @@ func handleWebSocketConnection(ctx context.Context, chat chat.Chat, conn *websoc
 	}
 	mu.Unlock()
 
-	listenToMessages(ctx, sub, conn)
+	listenToMessages(ctx, sub, conn, logFunc)
 }
 
-func listenToMessages(ctx context.Context, sub chat.Subscriber, conn *websocket.Conn) {
+func listenToMessages(ctx context.Context, sub chat.Subscriber, conn *websocket.Conn, logFunc func(msg string)) {
 	ctx = conn.CloseRead(ctx)
 
 	for {
@@ -68,6 +70,11 @@ func listenToMessages(ctx context.Context, sub chat.Subscriber, conn *websocket.
 				log.Printf("write error: %v", err)
 				return
 			}
+
+			if logFunc != nil {
+				logFunc(string(msg))
+			}
+
 		case <-ctx.Done():
 			return
 		}
