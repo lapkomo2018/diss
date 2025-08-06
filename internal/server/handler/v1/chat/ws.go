@@ -14,7 +14,10 @@ import (
 
 func websocketHandler(chat chat.Chat) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		conn, err := websocket.Accept(w, r, nil)
+		conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
+			InsecureSkipVerify: true,
+			OriginPatterns:     []string{"*"},
+		})
 		if err != nil {
 			http.Error(w, "failed to accept websocket connection", http.StatusInternalServerError)
 			return
